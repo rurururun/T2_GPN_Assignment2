@@ -8,10 +8,10 @@ public class StatusBar : MonoBehaviour
     public TextMeshProUGUI maxMana;
     public TextMeshProUGUI gold;
     public TextMeshProUGUI experience;
-    int maxhealth;
-    int currenthealth;
-    int maxmana;
-    int currentmana;
+    float maxhealth;
+    float currenthealth;
+    float maxmana;
+    float currentmana;
     double currentexp;
     double maxexp;
     GameObject player;

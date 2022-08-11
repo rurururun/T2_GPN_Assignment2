@@ -11,6 +11,7 @@ public class FireBall : MonoBehaviour
     public AudioSource dieSound;
     GameObject[] skeleton;
     GameObject[] archer;
+    GameObject[] hell_hand;
     GameObject boss;
     GameObject player;
     int bossHealth;
@@ -24,6 +25,7 @@ public class FireBall : MonoBehaviour
         manaCost = 30;
         skeleton = GameObject.FindGameObjectsWithTag("Skeleton");
         archer = GameObject.FindGameObjectsWithTag("Archer");
+        hell_hand = GameObject.FindGameObjectsWithTag("Hell_Hand");
         boss = GameObject.FindGameObjectWithTag("Boss");
         bossHealth = boss.GetComponent<Boss>().currentHealth;
     }
@@ -34,7 +36,7 @@ public class FireBall : MonoBehaviour
         Die();
         foreach (GameObject skele in skeleton)
         {
-            int health = skele.GetComponent<Skeleton>().currentHealth;
+            float health = skele.GetComponent<Skeleton>().currentHealth;
             if (health > 0 && col.collider.name.Equals(skele.GetComponent<Skeleton>().bodyCollider.name))
             {
                 skele.GetComponent<Skeleton>().TakeDamage(damage);
@@ -42,10 +44,18 @@ public class FireBall : MonoBehaviour
         }
         foreach (GameObject arc in archer)
         {
-            int health = arc.GetComponent<Archer>().currentHealth;
+            float health = arc.GetComponent<Archer>().currentHealth;
             if (health > 0 && col.collider.name.Equals(arc.GetComponent<Archer>().bodyCollider.name))
             {
                 arc.GetComponent<Archer>().TakeDamage(damage);
+            }
+        }
+        foreach (GameObject hell in hell_hand)
+        {
+            float health = hell.GetComponent<Hell_Hand>().currentHealth;
+            if (health > 0 && col.collider.name.Equals(hell.GetComponent<Hell_Hand>().bodyCollider.name))
+            {
+                hell.GetComponent<Hell_Hand>().TakeDamage(damage);
             }
         }
         if (bossHealth > 0 && col.collider.name.Equals(boss.GetComponent<Boss>().bodyCollider.name))

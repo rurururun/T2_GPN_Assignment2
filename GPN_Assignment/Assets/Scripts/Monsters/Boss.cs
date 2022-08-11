@@ -28,7 +28,7 @@ public class Boss : MonoBehaviour
     public Transform player;
     public LayerMask playerLayer;
     public Collider2D playerCollider;
-    int playerHealth;
+    float playerHealth;
     float distToPlayer;
     public int range;
 

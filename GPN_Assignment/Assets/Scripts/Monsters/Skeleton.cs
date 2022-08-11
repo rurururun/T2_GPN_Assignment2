@@ -1,9 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class Skeleton : MonoBehaviour
 {
+    // Variable for displaying dmg taken
+    public TextMeshProUGUI dmgTaken;
+    public Image healthBar;
+
     // Variable for movement
     public int walkSpeed;
 
@@ -30,14 +36,14 @@ public class Skeleton : MonoBehaviour
     private Transform player;
     public LayerMask playerLayer;
     private Collider2D playerCollider;
-    int playerHealth;
+    float playerHealth;
     float distToPlayer;
     public int range;
 
     // Variables for monster stats
-    public int maxHealth = 100;
-    public int currentHealth;
-    public int atk = 15;
+    public float maxHealth { get; private set; }
+    public float currentHealth { get; private set; }
+    int atk = 15;
     bool canAttack;
     bool hurt;
 
@@ -50,6 +56,9 @@ public class Skeleton : MonoBehaviour
     void Start()
     {
         // Initializing the monster
+        maxHealth = 25f;
+        healthBar.enabled = false;
+        dmgTaken.enabled = false;
         mustPatrol = true;
         skeleton = GetComponent<Rigidbody2D>();
         player = GameObject.Find("Player").transform;
@@ -62,6 +71,12 @@ public class Skeleton : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (currentHealth > 0)
+        {
+            healthBar.transform.position = new Vector2(skeleton.transform.position.x, skeleton.transform.position.y + 10);
+            healthBar.fillAmount = currentHealth / maxHealth;
+        }
+
         // Setting walking/running animation of monster based on the condition mustPatrol
         skeletonAnimator.SetBool("IsRunning", mustPatrol);
 
@@ -194,9 +209,21 @@ public class Skeleton : MonoBehaviour
         hurt = false;
     }
 
+    IEnumerator DisplayDmgTaken(int damage)
+    {
+        dmgTaken.text = "- " + damage.ToString() + " HP";
+        dmgTaken.transform.position = new Vector2(skeleton.transform.position.x + 5, skeleton.transform.position.y + 15);
+        dmgTaken.enabled = true;
+
+        yield return new WaitForSeconds(1);
+
+        dmgTaken.enabled = false;
+    }
+
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
+        healthBar.enabled = true;
 
         // Hurt animation
         skeletonAnimator.SetTrigger("Hurt");
@@ -205,16 +232,20 @@ public class Skeleton : MonoBehaviour
         // If it is dead, then call the Die() method
         if (currentHealth <= 0)
         {
+            StartCoroutine(DisplayDmgTaken(damage));
             Die();
         }
         else
         {
+            StartCoroutine(DisplayDmgTaken(damage));
             StartCoroutine(Hurt());
         }
     }
 
     void Die()
     {
+        healthBar.enabled = false;
+
         CharacterAttribute character = DataHandler.ReadFromJSON<CharacterAttribute>("CharacterAttribute");
 
         Debug.Log("Dead");

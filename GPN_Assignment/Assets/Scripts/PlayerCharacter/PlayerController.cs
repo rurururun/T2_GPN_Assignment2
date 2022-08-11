@@ -1,9 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
+    // Variable for displaying dmg taken
+    public TextMeshProUGUI dmgTaken;
+    public Image healthbar;
+    public Image manabar;
+
     public float walkSpeed, jumpVelocity;
     private Rigidbody2D p;
     private bool isTouchingGround;
@@ -14,6 +21,7 @@ public class PlayerController : MonoBehaviour
     public LayerMask monster1;
     public LayerMask monster2;
     public LayerMask monster3;
+    public LayerMask monster4;
 
     //Variable for attack
     public Transform AttackPoint;
@@ -23,10 +31,10 @@ public class PlayerController : MonoBehaviour
     public float attackRateBoost = 0f; //Get from item
 
     //Variable for character status
-    int maxHealth;
-    public int currentHealth;
-    int maxMana;
-    public int currentMana;
+    float maxHealth;
+    public float currentHealth;
+    float maxMana;
+    public float currentMana;
     int defense;
     public int atkDMG;
     bool attacking = false;
@@ -40,8 +48,10 @@ public class PlayerController : MonoBehaviour
 
     // Variable for fireball
     public GameObject fireBall;
-    public int shootSpeed;
+    int shootSpeed = 80;
     private bool canShoot;
+    bool canRegenMana;
+    bool canRegenHP;
 
     // Variable for rage
     bool canRage;
@@ -57,6 +67,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        dmgTaken.enabled = false;
         p = GetComponent<Rigidbody2D>();
         List<Quest> questList = DataHandler.ReadListFromJSON<Quest>("Quest");
         foreach (Quest quest in questList)
@@ -68,7 +79,8 @@ public class PlayerController : MonoBehaviour
             }
         }
         CharacterAttribute character = DataHandler.ReadFromJSON<CharacterAttribute>("CharacterAttribute");
-        currentHealth = character.health;
+        maxHealth = character.health;
+        currentHealth = maxHealth;
         atkDMG = character.strength;
         lvl = character.level;
         exp = character.experience;
@@ -79,16 +91,22 @@ public class PlayerController : MonoBehaviour
         gold = character.gold;
         canShoot = true;
         canRage = true;
+        canRegenMana = true;
+        canRegenHP = true;
 
         // Allow player to walk through monster
         Physics2D.IgnoreLayerCollision(7, 9);
         Physics2D.IgnoreLayerCollision(7, 11);
         Physics2D.IgnoreLayerCollision(7, 12);
+        Physics2D.IgnoreLayerCollision(7, 14);
     }
 
     // Update is called once per frame
     void Update()
     {
+        healthbar.fillAmount = currentHealth / maxHealth;
+        manabar.fillAmount = currentMana / maxMana;
+
         if (currentHealth > 0)
         {
             // Lvling up
@@ -145,15 +163,21 @@ public class PlayerController : MonoBehaviour
             }
 
             // Fireball
-            if (Input.GetKeyDown(KeyCode.E) && canShoot && !(currentMana <= 0))
+            if (Input.GetKeyDown(KeyCode.E) && canShoot && !(currentMana <= 30))
             {
                 StartCoroutine(Fireball());
             }
 
             // Regen Mana
-            if (canShoot)
+            if (Input.GetKeyDown(KeyCode.Q) && currentMana < maxMana && canRegenMana)
             {
                 StartCoroutine(RegenMana());
+            }
+
+            // Regen HP
+            if (Input.GetKeyDown(KeyCode.F) && currentHealth < maxHealth && canRegenHP)
+            {
+                StartCoroutine(RegenHP());
             }
 
             // Rage
@@ -163,16 +187,40 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-        
+
+    IEnumerator DisplayDmgTaken(int damage)
+    {
+        dmgTaken.text = "- " + damage.ToString() + " HP";
+        dmgTaken.transform.position = new Vector2(p.transform.position.x, p.transform.position.y + 10);
+        dmgTaken.enabled = true;
+
+        yield return new WaitForSeconds(1);
+
+        dmgTaken.enabled = false;
+    }
+
     public void TakeDamage(int damage)
     {
-        currentHealth -= damage - defense;
+        int damageTaken = damage - defense;
+        if (damageTaken > 0)
+        {
+            currentHealth -= damageTaken;
+        }
+        else
+        {
+            damageTaken = 0;
+        }
 
         //Hurt Animation
         playerAnimator.SetTrigger("Hurt");
         if (currentHealth <= 0)
         {
+            StartCoroutine(DisplayDmgTaken(damageTaken));
             Die();
+        }
+        else
+        {
+            StartCoroutine(DisplayDmgTaken(damageTaken));
         }
     }
 
@@ -235,6 +283,18 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        // Detect hell_hands in range of attack
+        Collider2D[] hell_hands = Physics2D.OverlapCircleAll(AttackPoint.position, attackRange, monster4);
+
+        if (hell_hands.Length != 0)
+        {
+            // Damage hell_hands
+            foreach (Collider2D hell_hand in hell_hands)
+            {
+                hell_hand.GetComponent<Hell_Hand>().TakeDamage(atkDMG);
+            }
+        }
+
         // Detect boss in range of attack
         Collider2D[] boss = Physics2D.OverlapCircleAll(AttackPoint.position, attackRange, monster3);
 
@@ -275,15 +335,13 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(5);
 
         canShoot = true;
-
-        Debug.Log("Can Shoot");
     }
 
     IEnumerator Rage()
     {
         canRage = false;
 
-        atkDMG += 30;
+        atkDMG += (int)(atkDMG * 0.3);
 
         rage.Play();
 
@@ -293,7 +351,7 @@ public class PlayerController : MonoBehaviour
 
         Debug.Log("Rage Ended");
 
-        atkDMG -= 30;
+        atkDMG -= (int)(atkDMG * 0.3);
 
         rageEnd.Play();
 
@@ -304,15 +362,33 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator RegenMana()
     {
-        yield return new WaitForSeconds(10);
+        canRegenMana = false;
 
-        if (currentMana < maxMana)
-        {
-            currentMana += 10;
-        }
-        else
+        currentMana += (float)(maxMana * 0.3);
+
+        if (currentMana > maxMana)
         {
             currentMana = maxMana;
         }
+
+        yield return new WaitForSeconds(15);
+
+        canRegenMana = true;
+    }
+
+    IEnumerator RegenHP()
+    {
+        canRegenHP = false;
+
+        currentHealth += (float)(maxHealth * 0.3);
+
+        if (currentHealth > maxHealth)
+        {
+            currentHealth = maxHealth;
+        }
+
+        yield return new WaitForSeconds(15);
+
+        canRegenHP = true;
     }
 }

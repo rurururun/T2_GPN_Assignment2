@@ -5,11 +5,11 @@ using UnityEngine;
 public class Arrow : MonoBehaviour
 {
     public float dieTime;
-    public int damage;
+    int damage = 30;
     public GameObject diePEFFECT;
     public Transform player;
     public Collider2D bodyCollider;
-    int playerHealth;
+    float playerHealth;
 
     // Start is called before the first frame update
     void Start()
@@ -30,8 +30,11 @@ public class Arrow : MonoBehaviour
             if (playerHealth > 0 && col.collider.name.Equals(player.GetComponent<PlayerController>().bodyCollider.name))
             {
                 player.GetComponent<PlayerController>().TakeDamage(damage);
-                Debug.Log("Hit");
             }
+        }
+        else
+        {
+            Die();
         }
     }
 

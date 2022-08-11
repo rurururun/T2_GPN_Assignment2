@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class Archer : MonoBehaviour
+public class Hell_Hand : MonoBehaviour
 {
     // Variable for displaying dmg taken
     public TextMeshProUGUI dmgTaken;
@@ -20,18 +20,19 @@ public class Archer : MonoBehaviour
     // Variables for detecting collision
     public Transform groundCheckPos;
     public Transform objectCheckPos;
-    public Transform attackPosA;
-    public Transform attackPosB;
+    public Transform attackPos;
     public LayerMask groundLayer;
     public LayerMask obstacles;
     public LayerMask skeletonLayer;
     public LayerMask archerLayer;
+    public LayerMask hell_handLayer;
     public Collider2D bodyCollider;
-    public Rigidbody2D archer;
+    public Rigidbody2D hell_hand;
 
     // Array of colliders of the monsters
     private Collider2D[] skeletons;
     private Collider2D[] archers;
+    private Collider2D[] hell_hands;
 
     // Variables for detecting player
     private Transform player;
@@ -39,35 +40,34 @@ public class Archer : MonoBehaviour
     private Collider2D playerCollider;
     float playerHealth;
     float distToPlayer;
-    int range = 35;
+    int range = 30;
 
     // Variables for monster stats
     public float maxHealth { get; private set; }
     public float currentHealth { get; private set; }
+    int atk = 60;
+    bool canAttack;
     bool hurt;
 
-    // Variable for arrow
-    public GameObject arrow;
-    int shootSpeed = 40;
-    bool canShoot;
-
     // Animator for monster
-    public Animator archerAnimator;
+    public Animator hell_handAnimator;
+
+    public AudioSource swing;
 
     // Start is called before the first frame update
     void Start()
     {
         // Initializing the monster
-        mustPatrol = true;
-        archer = GetComponent<Rigidbody2D>();
-        player = GameObject.Find("Player").transform;
-        playerCollider = GameObject.Find("Player").GetComponent<PlayerController>().bodyCollider;
-        maxHealth = 50f;
-        currentHealth = maxHealth;
-        canShoot = true;
-        hurt = false;
+        maxHealth = 150f;
         healthBar.enabled = false;
         dmgTaken.enabled = false;
+        mustPatrol = true;
+        hell_hand = GetComponent<Rigidbody2D>();
+        player = GameObject.Find("Player").transform;
+        playerCollider = GameObject.Find("Player").GetComponent<PlayerController>().bodyCollider;
+        currentHealth = maxHealth;
+        canAttack = true;
+        hurt = false;
     }
 
     // Update is called once per frame
@@ -75,12 +75,12 @@ public class Archer : MonoBehaviour
     {
         if (currentHealth > 0)
         {
-            healthBar.transform.position = new Vector2(archer.transform.position.x, archer.transform.position.y + 10);
+            healthBar.transform.position = new Vector2(hell_hand.transform.position.x, hell_hand.transform.position.y + 10);
             healthBar.fillAmount = currentHealth / maxHealth;
         }
 
         // Setting walking/running animation of monster based on the condition mustPatrol
-        archerAnimator.SetBool("IsRunning", mustPatrol);
+        hell_handAnimator.SetBool("IsRunning", mustPatrol);
 
         // Getting player's health to see whether player is dead or alive
         playerHealth = playerCollider.GetComponent<PlayerController>().currentHealth;
@@ -108,20 +108,20 @@ public class Archer : MonoBehaviour
 
             // Checking whether player is within the monster's attack range,
             // If it is then the monster will attack the player
-            if (Physics2D.OverlapArea(attackPosA.position, attackPosB.position) && canShoot && !hurt)
+            if (Physics2D.OverlapCircle(attackPos.position, 0.1f, playerLayer) && canAttack && !hurt)
             {
                 // Forces monster to stop moving when attacking
                 mustPatrol = false;
-                archer.velocity = Vector2.zero;
+                hell_hand.velocity = Vector2.zero;
 
                 // Dealing damage
-                StartCoroutine(Shoot());
+                StartCoroutine(Attack());
             }
         }
         else if (currentHealth <= 0 || playerHealth <= 0)
         {
             mustPatrol = false;
-            archer.velocity = Vector2.zero;
+            hell_hand.velocity = Vector2.zero;
         }
         else
         {
@@ -143,6 +143,7 @@ public class Archer : MonoBehaviour
         // Getting the list of monsters that it has came into contact with
         skeletons = Physics2D.OverlapCircleAll(objectCheckPos.position, 0.1f, skeletonLayer);
         archers = Physics2D.OverlapCircleAll(objectCheckPos.position, 0.1f, archerLayer);
+        hell_hands = Physics2D.OverlapCircleAll(objectCheckPos.position, 0.1f, hell_handLayer);
 
         // Checking if monster needs to turn
         if (mustTurn || bodyCollider.IsTouchingLayers(obstacles))
@@ -171,9 +172,19 @@ public class Archer : MonoBehaviour
                 }
             }
         }
+        if (hell_hands.Length != 0)
+        {
+            foreach (Collider2D enemy in hell_hands)
+            {
+                if (bodyCollider.IsTouching(enemy))
+                {
+                    Physics2D.IgnoreCollision(bodyCollider, enemy);
+                }
+            }
+        }
 
         // Setting the movement of the monster
-        archer.velocity = new Vector2(walkSpeed * Time.fixedDeltaTime, archer.velocity.y);
+        hell_hand.velocity = new Vector2(walkSpeed * Time.fixedDeltaTime, hell_hand.velocity.y);
     }
 
     void Flip()
@@ -184,10 +195,37 @@ public class Archer : MonoBehaviour
         mustPatrol = true;
     }
 
+    IEnumerator Attack()
+    {
+        canAttack = false;
+
+        // Activates the attack animation of the monster
+        hell_handAnimator.SetTrigger("Attack");
+
+        swing.Play();
+
+        yield return new WaitForSeconds(1);
+
+        playerCollider.GetComponent<PlayerController>().TakeDamage(atk);
+
+        yield return new WaitForSeconds(1);
+
+        canAttack = true;
+    }
+
+    IEnumerator Hurt()
+    {
+        hurt = true;
+
+        yield return new WaitForSeconds(2);
+
+        hurt = false;
+    }
+
     IEnumerator DisplayDmgTaken(int damage)
     {
         dmgTaken.text = "- " + damage.ToString() + " HP";
-        dmgTaken.transform.position = new Vector2(archer.transform.position.x + 5, archer.transform.position.y + 15);
+        dmgTaken.transform.position = new Vector2(hell_hand.transform.position.x + 5, hell_hand.transform.position.y + 15);
         dmgTaken.enabled = true;
 
         yield return new WaitForSeconds(1);
@@ -201,7 +239,7 @@ public class Archer : MonoBehaviour
         healthBar.enabled = true;
 
         // Hurt animation
-        archerAnimator.SetTrigger("Hurt");
+        hell_handAnimator.SetTrigger("Hurt");
 
         // Check if monster is dead,
         // If it is dead, then call the Die() method
@@ -224,7 +262,7 @@ public class Archer : MonoBehaviour
         CharacterAttribute character = DataHandler.ReadFromJSON<CharacterAttribute>("CharacterAttribute");
 
         // Death animation
-        archerAnimator.SetBool("IsDead", true);
+        hell_handAnimator.SetBool("IsDead", true);
 
         // Disables the monster collider
         GetComponent<Collider2D>().enabled = false;
@@ -237,11 +275,43 @@ public class Archer : MonoBehaviour
         }
 
         // Gives player exp and gold
-        player.GetComponent<PlayerController>().exp += 100;
-        player.GetComponent<PlayerController>().gold += 200;
-        character.experience += 100;
-        character.gold += 200;
+        player.GetComponent<PlayerController>().exp += 200;
+        player.GetComponent<PlayerController>().gold += 500;
+        character.experience += 200;
+        character.gold += 500;
         DataHandler.SaveToJSON(character, "CharacterAttribute");
+
+        // Quest
+        Quest currentQuest = player.GetComponent<PlayerController>().quest1;
+        Debug.Log(currentQuest.questTitle);
+        if (currentQuest.archiveAmount < currentQuest.objectiveAmount)
+        {
+            List<Quest> questList = DataHandler.ReadListFromJSON<Quest>("Quest");
+            for (int i = 0; i < questList.Count; i++)
+            {
+                if (questList[i].questTitle == currentQuest.questTitle)
+                {
+                    questList[i].archiveAmount += 1;
+                    currentQuest.archiveAmount += 1;
+                    break;
+                }
+            }
+            DataHandler.SaveToJSON(questList, "Quest");
+        }
+        else
+        {
+            List<Quest> questList = DataHandler.ReadListFromJSON<Quest>("Quest");
+            for (int i = 0; i < questList.Count; i++)
+            {
+                if (questList[i].questTitle == currentQuest.questTitle)
+                {
+                    questList[i].questStatus = "Completed";
+                    currentQuest.questStatus = "Completed";
+                    break;
+                }
+            }
+            DataHandler.SaveToJSON(questList, "Quest");
+        }
 
         // Monster revives after a set amount of time
         StartCoroutine(MonsterRespawn());
@@ -252,7 +322,7 @@ public class Archer : MonoBehaviour
         yield return new WaitForSeconds(20);
 
         // Disables the death animation
-        archerAnimator.SetBool("IsDead", false);
+        hell_handAnimator.SetBool("IsDead", false);
 
         // Enables the monster collider
         GetComponent<Collider2D>().enabled = true;
@@ -260,40 +330,5 @@ public class Archer : MonoBehaviour
         // Set the condition of monster to before death
         currentHealth = maxHealth;
         mustPatrol = true;
-    }
-
-    IEnumerator Shoot()
-    {
-        canShoot = false;
-
-        // Activates the attack animation of the monster
-        archerAnimator.SetTrigger("Attack");
-
-        yield return new WaitForSeconds(0.8f);
-
-        GameObject newArrow = Instantiate(arrow, attackPosA.position, Quaternion.identity);
-
-        if (transform.localScale.x > 0)
-        {
-            newArrow.GetComponent<Rigidbody2D>().velocity = new Vector2(shootSpeed, 0f);
-        }
-        else
-        {
-            newArrow.transform.localScale = new Vector2(newArrow.transform.localScale.x * -1, newArrow.transform.localScale.y);
-            newArrow.GetComponent<Rigidbody2D>().velocity = new Vector2(shootSpeed * -1, 0f);
-        }
-
-        yield return new WaitForSeconds(0.8f);
-
-        canShoot = true;
-    }
-
-    IEnumerator Hurt()
-    {
-        hurt = true;
-
-        yield return new WaitForSeconds(2);
-
-        hurt = false;
     }
 }

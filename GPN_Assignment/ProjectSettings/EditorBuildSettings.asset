@@ -14,7 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/HomeTown.unity
     guid: 53bbb021593220f479e743fe1bbeab3c
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Start Screen.unity
     guid: 06d91bc122cb6e7469f24da8f2ca6057
   - enabled: 1
