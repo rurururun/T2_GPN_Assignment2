@@ -57,10 +57,10 @@ TagManager:
   - name: NPC
     uniqueID: 2041493809
     locked: 0
-  - name: UI
+  - name: Character
     uniqueID: 1281746055
     locked: 0
-  - name: Character
+  - name: UI
     uniqueID: 4118512503
     locked: 0
   - name: StatusBarBackground
