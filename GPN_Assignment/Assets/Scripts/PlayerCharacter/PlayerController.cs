@@ -314,6 +314,7 @@ public class PlayerController : MonoBehaviour
         //Die animation
         playerAnimator.SetBool("IsDead", true);
         p.velocity = Vector2.zero;
+        footstep.Stop();
     }
 
     void OnDrawGizmosSelected()

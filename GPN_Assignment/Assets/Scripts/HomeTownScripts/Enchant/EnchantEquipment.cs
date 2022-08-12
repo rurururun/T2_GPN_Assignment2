@@ -86,27 +86,25 @@ public class EnchantEquipment : MonoBehaviour
     //Update Overall Character Attribute
     public static void updateChracterAttribute(List<Equipment> equipmentList, Equipment currentEquipment, CharacterAttribute character)
     {
-        Debug.Log("equipmentType" + currentEquipment.equipmentType);
         foreach (Equipment equipment in equipmentList)
         {
-            if (equipment.equipmentType == currentEquipment.equipmentType)
+            if (equipment.equipmentType == currentEquipment.equipmentType && equipment.equipmentType == "Weapon")
             {
                 character.strength = equipment.equipmentArritbute;
                 break;
             }
-            else if (equipment.equipmentType == currentEquipment.equipmentType)
+            else if (equipment.equipmentType == currentEquipment.equipmentType && equipment.equipmentType == "Ring")
             {
                 character.mana = equipment.equipmentArritbute;
                 break;
             }
-            else if (equipment.equipmentType == currentEquipment.equipmentType)
+            else if (equipment.equipmentType == currentEquipment.equipmentType && equipment.equipmentType == "Helmet")
             {
                 character.health = equipment.equipmentArritbute;
                 break;
             }
-            else if (equipment.equipmentType == currentEquipment.equipmentType)
+            else if (equipment.equipmentType == currentEquipment.equipmentType && equipment.equipmentType == "Armor")
             {
-                Debug.Log("Defense update");
                 character.defense = equipment.equipmentArritbute;
                 break;
             }
