@@ -19,6 +19,11 @@ public class PlayerController : MonoBehaviour
     public Image rejuvinateSpell;
     public TextMeshProUGUI manaIndicator;
 
+    public Image questPanel;
+    public TextMeshProUGUI questTitle;
+    public Image questProgressionBar;
+    public TextMeshProUGUI questProgression;
+
     public float walkSpeed, jumpVelocity;
     private Rigidbody2D p;
     private bool isTouchingGround;
@@ -84,6 +89,7 @@ public class PlayerController : MonoBehaviour
         manaIndicator.enabled = false;
         manaCost.enabled = false;
         p = GetComponent<Rigidbody2D>();
+        quest1 = null;
         List<Quest> questList = DataHandler.ReadListFromJSON<Quest>("Quest");
         foreach (Quest quest in questList)
         {
@@ -93,13 +99,37 @@ public class PlayerController : MonoBehaviour
                 break;
             }
         }
+        if (quest1 != null)
+        {
+            questPanel.gameObject.SetActive(true);
+
+            float achieved_amount = quest1.archiveAmount;
+            float needed_amount = quest1.objectiveAmount;
+
+            if (achieved_amount < needed_amount)
+            {
+                questTitle.text = quest1.questTitle;
+                questProgression.text = quest1.archiveAmount + "/" + quest1.objectiveAmount;
+                questProgressionBar.fillAmount = achieved_amount / needed_amount;
+            }
+            else
+            {
+                questTitle.text = quest1.questTitle;
+                questProgression.text = "Completed";
+                questProgressionBar.fillAmount = 1f;
+            }
+        }
+        else
+        {
+            questPanel.gameObject.SetActive(false);
+        }
         CharacterAttribute character = DataHandler.ReadFromJSON<CharacterAttribute>("CharacterAttribute");
         maxHealth = character.health;
         currentHealth = maxHealth;
         atkDMG = character.strength;
         lvl = character.level;
         exp = character.experience;
-        maxexp = Mathf.FloorToInt((float)((character.level + 1000) * 1.5));
+        maxexp = Mathf.FloorToInt((character.level * 200) + 1000);
         defense = character.defense;
         currentMana = character.mana;
         maxMana = currentMana;
@@ -122,6 +152,34 @@ public class PlayerController : MonoBehaviour
         healthbar.fillAmount = currentHealth / maxHealth;
         manabar.fillAmount = currentMana / maxMana;
 
+        if (quest1 != null)
+        {
+            float achieved_amount = quest1.archiveAmount;
+            float needed_amount = quest1.objectiveAmount;
+
+            if (achieved_amount < needed_amount)
+            {
+                questProgression.text = quest1.archiveAmount + "/" + quest1.objectiveAmount;
+                questProgressionBar.fillAmount = achieved_amount / needed_amount;
+            }
+            else
+            {
+                List<Quest> questList = DataHandler.ReadListFromJSON<Quest>("Quest");
+                for (int i = 0; i < questList.Count; i++)
+                {
+                    if (questList[i].questTitle == quest1.questTitle)
+                    {
+                        questList[i].questStatus = "Completed";
+                        quest1.questStatus = "Completed";
+                        break;
+                    }
+                }
+                DataHandler.SaveToJSON(questList, "Quest");
+                questProgression.text = "Completed";
+                questProgressionBar.fillAmount = 1f;
+            }
+        }
+
         if (currentHealth > 0)
         {
             // Lvling up
@@ -134,7 +192,7 @@ public class PlayerController : MonoBehaviour
                 character.level += 1;
                 character.experience = exp;
                 character.remainingStatsPt += 1;
-                maxexp = Mathf.FloorToInt((float)((character.level + 1000) * 1.5));
+                maxexp = Mathf.FloorToInt((character.level * 200) + 1000);
                 DataHandler.SaveToJSON(character, "CharacterAttribute");
             }
 
@@ -364,7 +422,7 @@ public class PlayerController : MonoBehaviour
             newFireBall.GetComponent<Rigidbody2D>().velocity = new Vector2(shootSpeed * -1, 0f);
         }
 
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
 
         canShoot = true;
 

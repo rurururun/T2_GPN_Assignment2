@@ -271,7 +271,7 @@ public class Boss : MonoBehaviour
     IEnumerator DisplayThingsGranted()
     {
         goldGranted.text = "+ " + 1000 + "G";
-        expGranted.text = "+ " + 2000 + "EXP";
+        expGranted.text = "+ " + 1000 + "EXP";
         goldGranted.enabled = true;
         expGranted.enabled = true;
 
@@ -302,12 +302,29 @@ public class Boss : MonoBehaviour
 
         // Gives player exp and gold
         player.GetComponent<PlayerController>().exp += 1000;
-        player.GetComponent<PlayerController>().gold += 2000;
+        player.GetComponent<PlayerController>().gold += 1000;
         character.experience += 1000;
-        character.gold += 2000;
+        character.gold += 1000;
         DataHandler.SaveToJSON(character, "CharacterAttribute");
 
         StartCoroutine(DisplayThingsGranted());
+
+        // Quest
+        Quest currentQuest = player.GetComponent<PlayerController>().quest1;
+        if (currentQuest.archiveAmount < currentQuest.objectiveAmount && currentQuest.questTitle == "Isn't he the last boss?!")
+        {
+            List<Quest> questList = DataHandler.ReadListFromJSON<Quest>("Quest");
+            for (int i = 0; i < questList.Count; i++)
+            {
+                if (questList[i].questTitle == currentQuest.questTitle)
+                {
+                    questList[i].archiveAmount += 1;
+                    player.GetComponent<PlayerController>().quest1.archiveAmount += 1;
+                    break;
+                }
+            }
+            DataHandler.SaveToJSON(questList, "Quest");
+        }
 
         // Monster revives after a set amount of time
         StartCoroutine(MonsterRespawn());

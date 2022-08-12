@@ -15,19 +15,19 @@ public class GameSetUpScript : MonoBehaviour
             Debug.Log("Setting up Equipment");
 
             //Strength
-            Equipment newWeapon = new Equipment("Weapon", 5, 0,100);
+            Equipment newWeapon = new Equipment("Weapon", 5, 0, 1000);
             equipmentList.Add(newWeapon);
 
             //Mana
-            Equipment newRing = new Equipment("Ring", 100, 0,100);
+            Equipment newRing = new Equipment("Ring", 100, 0, 1000);
             equipmentList.Add(newRing);
         
             //Defense
-            Equipment newArmor = new Equipment("Armor", 5, 0,100);
+            Equipment newArmor = new Equipment("Armor", 5, 0, 1000);
             equipmentList.Add(newArmor);
 
             //Health
-            Equipment newHelmet = new Equipment("Helmet", 100, 0,100);
+            Equipment newHelmet = new Equipment("Helmet", 100, 0, 1000);
             equipmentList.Add(newHelmet);
 
             DataHandler.SaveToJSON(equipmentList, "Equipment");
@@ -44,14 +44,17 @@ public class GameSetUpScript : MonoBehaviour
         //Setting up quest
         List<Quest> questList = new List<Quest>();
         //First quest
-        Quest warriorSkeletonQuest = new Quest("Warrior Skeleton Invasion!", "Slay 20 warrior skeleton",20,0,50,100,"Not Accepted");
+        Quest warriorSkeletonQuest = new Quest("Warrior Skeleton Invasion!", "Slay 20 warrior skeleton",20,0, 250, 1000,"Not Accepted");
         //Second quest
-        Quest archerSkeletonQuest = new Quest("Archer Skeleton Invasion!", "Slay 10 archer skeleton", 10, 0, 50, 100, "Not Accepted");
+        Quest archerSkeletonQuest = new Quest("Archer Skeleton Invasion!", "Slay 20 archer skeleton", 20, 0, 400, 1500, "Not Accepted");
         //Third quest
-        Quest bossSkeletonQuest = new Quest("Isn't he the last boss?!", "Slay 3 boss skeleton", 3, 0, 150, 300, "Not Accepted");
+        Quest bossSkeletonQuest = new Quest("Isn't he the last boss?!", "Slay 5 boss skeleton", 5, 0, 1200, 4000, "Not Accepted");
+        //Fourth quest
+        Quest hell_handQuest = new Quest("What are those?!", "Slay 20 hell hands", 20, 0, 600, 2000, "Not Accepted");
         questList.Add(warriorSkeletonQuest);
         questList.Add(archerSkeletonQuest);
         questList.Add(bossSkeletonQuest);
+        questList.Add(hell_handQuest);
         DataHandler.SaveToJSON(questList, "Quest");
     }
 }

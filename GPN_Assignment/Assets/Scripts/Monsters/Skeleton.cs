@@ -238,7 +238,7 @@ public class Skeleton : MonoBehaviour
     IEnumerator DisplayThingsGranted()
     {
         goldGranted.text = "+ " + 100 + "G";
-        expGranted.text = "+ " + 50 + "EXP";
+        expGranted.text = "+ " + 100 + "EXP";
         goldGranted.enabled = true;
         expGranted.enabled = true;
 
@@ -270,9 +270,9 @@ public class Skeleton : MonoBehaviour
         }
 
         // Gives player exp and gold
-        player.GetComponent<PlayerController>().exp += 50;
+        player.GetComponent<PlayerController>().exp += 100;
         player.GetComponent<PlayerController>().gold += 100;
-        character.experience += 50;
+        character.experience += 100;
         character.gold += 100;
         DataHandler.SaveToJSON(character, "CharacterAttribute");
 
@@ -280,8 +280,7 @@ public class Skeleton : MonoBehaviour
 
         // Quest
         Quest currentQuest = player.GetComponent<PlayerController>().quest1;
-        Debug.Log(currentQuest.questTitle);
-        if (currentQuest.archiveAmount < currentQuest.objectiveAmount)
+        if (currentQuest.archiveAmount < currentQuest.objectiveAmount && currentQuest.questTitle == "Warrior Skeleton Invasion!")
         {
             List<Quest> questList = DataHandler.ReadListFromJSON<Quest>("Quest");
             for (int i = 0; i < questList.Count; i++)
@@ -289,21 +288,7 @@ public class Skeleton : MonoBehaviour
                 if (questList[i].questTitle == currentQuest.questTitle)
                 {
                     questList[i].archiveAmount += 1;
-                    currentQuest.archiveAmount += 1;
-                    break;
-                }
-            }
-            DataHandler.SaveToJSON(questList, "Quest");
-        }
-        else
-        {
-            List<Quest> questList = DataHandler.ReadListFromJSON<Quest>("Quest");
-            for (int i = 0; i < questList.Count; i++)
-            {
-                if (questList[i].questTitle == currentQuest.questTitle)
-                {
-                    questList[i].questStatus = "Completed";
-                    currentQuest.questStatus = "Completed";
+                    player.GetComponent<PlayerController>().quest1.archiveAmount += 1;
                     break;
                 }
             }

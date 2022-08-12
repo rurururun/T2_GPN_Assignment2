@@ -52,7 +52,7 @@ public class EnchantEquipment : MonoBehaviour
                 }
                 character.gold -= enchantEquipment.equipmentEnchantCost;
                 enchantEquipment.equipmentEnchantLvl += 1;
-                enchantEquipment.equipmentEnchantCost += 10 * enchantEquipment.equipmentEnchantLvl;
+                enchantEquipment.equipmentEnchantCost = (200 * enchantEquipment.equipmentEnchantLvl) + 1000;
 
                 foreach (Equipment equipment in equipmentList)
                 {
@@ -90,18 +90,22 @@ public class EnchantEquipment : MonoBehaviour
             if (equipment.equipmentType == currentEquipment.equipmentType)
             {
                 character.strength = equipment.equipmentArritbute;
+                break;
             }
             else if (equipment.equipmentType == currentEquipment.equipmentType)
             {
                 character.mana = equipment.equipmentArritbute;
+                break;
             }
             else if (equipment.equipmentType == currentEquipment.equipmentType)
             {
                 character.health = equipment.equipmentArritbute;
+                break;
             }
             else
             {
                 character.defense = equipment.equipmentArritbute;
+                break;
             }
         }
 
@@ -112,7 +116,7 @@ public class EnchantEquipment : MonoBehaviour
 
         for (int i = 0; i < character.healthStatsPt; i++)
         {
-            character.healthStatsPt += 10;
+            character.health += 10;
         }
 
         for (int i = 0; i < character.defenseStatsPt; i++)

@@ -214,7 +214,7 @@ public class Archer : MonoBehaviour
     IEnumerator DisplayThingsGranted()
     {
         goldGranted.text = "+ " + 200 + "G";
-        expGranted.text = "+ " + 100 + "EXP";
+        expGranted.text = "+ " + 200 + "EXP";
         goldGranted.enabled = true;
         expGranted.enabled = true;
 
@@ -246,13 +246,30 @@ public class Archer : MonoBehaviour
         }
 
         // Gives player exp and gold
-        player.GetComponent<PlayerController>().exp += 100;
+        player.GetComponent<PlayerController>().exp += 200;
         player.GetComponent<PlayerController>().gold += 200;
-        character.experience += 100;
+        character.experience += 200;
         character.gold += 200;
         DataHandler.SaveToJSON(character, "CharacterAttribute");
 
         StartCoroutine(DisplayThingsGranted());
+
+        // Quest
+        Quest currentQuest = player.GetComponent<PlayerController>().quest1;
+        if (currentQuest.archiveAmount < currentQuest.objectiveAmount && currentQuest.questTitle == "Archer Skeleton Invasion!")
+        {
+            List<Quest> questList = DataHandler.ReadListFromJSON<Quest>("Quest");
+            for (int i = 0; i < questList.Count; i++)
+            {
+                if (questList[i].questTitle == currentQuest.questTitle)
+                {
+                    questList[i].archiveAmount += 1;
+                    player.GetComponent<PlayerController>().quest1.archiveAmount += 1;
+                    break;
+                }
+            }
+            DataHandler.SaveToJSON(questList, "Quest");
+        }
 
         // Monster revives after a set amount of time
         StartCoroutine(MonsterRespawn());

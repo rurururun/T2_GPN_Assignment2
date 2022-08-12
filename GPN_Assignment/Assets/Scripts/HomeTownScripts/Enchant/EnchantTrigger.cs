@@ -89,9 +89,8 @@ public class EnchantTrigger : MonoBehaviour
 
     public static void updateEquipmentList()
     {
-        equipmentList = new List<Equipment>();
-
         equipmentList = DataHandler.ReadListFromJSON<Equipment>("Equipment");
+
         if (equipmentList.Count > 0)
         {
             Debug.Log("Equipment list updated");

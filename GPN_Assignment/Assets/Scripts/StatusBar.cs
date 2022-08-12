@@ -39,7 +39,7 @@ public class StatusBar : MonoBehaviour
         currenthealth = player.GetComponent<PlayerController>().currentHealth;
         maxmana = character.mana;
         currentmana = player.GetComponent<PlayerController>().currentMana;
-        maxexp = Mathf.FloorToInt((float)((character.level + 1000) * 1.5));
+        maxexp = Mathf.FloorToInt((character.level * 200) + 1000);
         currentexp = player.GetComponent<PlayerController>().exp;
         maxHealth.text = currenthealth.ToString() + " / " + maxhealth.ToString();
         maxMana.text = currentmana.ToString() + " / " + maxmana.ToString();
