@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour
     // Variable for fireball
     public GameObject fireBall;
     int shootSpeed = 80;
-    private bool canShoot;
+    bool canShoot;
     bool canRegenMana;
     bool canRegenHP;
 
@@ -228,6 +228,7 @@ public class PlayerController : MonoBehaviour
     {
         //Die animation
         playerAnimator.SetBool("IsDead", true);
+        p.velocity = Vector2.zero;
     }
 
     void OnDrawGizmosSelected()
@@ -332,7 +333,7 @@ public class PlayerController : MonoBehaviour
             newFireBall.GetComponent<Rigidbody2D>().velocity = new Vector2(shootSpeed * -1, 0f);
         }
 
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(2);
 
         canShoot = true;
     }

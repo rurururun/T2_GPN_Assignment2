@@ -4,23 +4,23 @@ using UnityEngine;
 
 public class FireBall : MonoBehaviour
 {
-    public float dieTime;
-    public int damage;
-    public int manaCost;
-    public GameObject diePEFFECT;
+    int damage;
+    public int manaCost { get; private set; }
     public AudioSource dieSound;
     GameObject[] skeleton;
     GameObject[] archer;
     GameObject[] hell_hand;
     GameObject boss;
     GameObject player;
-    int bossHealth;
+    float bossHealth;
+    public Collider2D bodyCollider;
+    Collider2D playerCollider;
 
     // Start is called before the first frame update
     void Start()
     {
-        Physics2D.IgnoreLayerCollision(7, 13);
         player = GameObject.Find("Player");
+        playerCollider = player.GetComponent<PlayerController>().bodyCollider;
         damage = player.GetComponent<PlayerController>().atkDMG * 2;
         manaCost = 30;
         skeleton = GameObject.FindGameObjectsWithTag("Skeleton");
@@ -28,9 +28,9 @@ public class FireBall : MonoBehaviour
         hell_hand = GameObject.FindGameObjectsWithTag("Hell_Hand");
         boss = GameObject.FindGameObjectWithTag("Boss");
         bossHealth = boss.GetComponent<Boss>().currentHealth;
+        Physics2D.IgnoreCollision(playerCollider, bodyCollider);
     }
 
-    // Update is called once per frame
     void OnCollisionEnter2D(Collision2D col)
     {
         Die();
@@ -61,7 +61,6 @@ public class FireBall : MonoBehaviour
         if (bossHealth > 0 && col.collider.name.Equals(boss.GetComponent<Boss>().bodyCollider.name))
         {
             boss.GetComponent<Boss>().TakeDamage(damage);
-            Debug.Log("Hit");
         }
     }
 

@@ -248,8 +248,6 @@ public class Skeleton : MonoBehaviour
 
         CharacterAttribute character = DataHandler.ReadFromJSON<CharacterAttribute>("CharacterAttribute");
 
-        Debug.Log("Dead");
-
         // Death animation
         skeletonAnimator.SetBool("IsDead", true);
 
