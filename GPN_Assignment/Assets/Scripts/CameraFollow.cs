@@ -6,7 +6,7 @@ public class CameraFollow : MonoBehaviour
 {
     public float followSpeed, yPos;
 
-    private Transform player;
+    Transform player;
 
     // Start is called before the first frame update
     void Start()
@@ -17,6 +17,7 @@ public class CameraFollow : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Debug.Log("Following");
         Vector2 targetPos = player.position;
         Vector2 smoothPos = Vector2.Lerp(transform.position, targetPos, followSpeed * Time.deltaTime);
 

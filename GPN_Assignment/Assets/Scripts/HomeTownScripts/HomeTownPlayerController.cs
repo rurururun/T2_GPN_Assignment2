@@ -1,39 +1,50 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HomeTownPlayerController : MonoBehaviour
 {
-    public float walkSpeed, jumpVelocity;
-    private Rigidbody2D p;
-    private bool isTouchingGround;
-    public AudioSource footstep;
+    float walkSpeed = 10000;
+    float jumpVelocity = 8000;
+    Rigidbody2D p;
+    bool isTouchingGround;
     public Collider2D bodyCollider;
     public LayerMask ground;
     public Animator playerAnimator;
-    public LayerMask enemyLayers;
-    public Rigidbody2D enemy;
-
-    public Transform collideEnemy;
-
-    //Variable for attack
-    public Transform AttackPoint;
-    public float attackRange = 0.5f;
-
-    public float attackRate = 1.1f;
-    public float attackRateBoost = 0f; //Get from item
-    float nextAttackTime = 0f;
 
     //Variable for character status
-    public int maxHealth = 100;
-    public int equipmentHealth;
-    int currentHealth;
+    float maxHealth;
+    public float currentHealth;
+    float maxMana;
+    public float currentMana;
+    int defense;
+    public int atkDMG;
+    int lvl;
+    int maxexp;
+    public int exp;
+    public int gold;
 
+    public Image healthbar;
+    public Image manabar;
+
+    public AudioSource footstep;
 
     // Start is called before the first frame update
     void Start()
     {
         p = GetComponent<Rigidbody2D>();
+        CharacterAttribute character = DataHandler.ReadFromJSON<CharacterAttribute>("CharacterAttribute");
+        maxHealth = character.health;
+        currentHealth = maxHealth;
+        atkDMG = character.strength;
+        lvl = character.level;
+        exp = character.experience;
+        maxexp = Mathf.FloorToInt((character.level * 200) + 1000);
+        defense = character.defense;
+        currentMana = character.mana;
+        maxMana = currentMana;
+        gold = character.gold;
     }
 
     // Update is called once per frame
@@ -41,8 +52,20 @@ public class HomeTownPlayerController : MonoBehaviour
     {
         if (!DialogueManager.GetInstance().dialogueIsPlaying)
         {
-            // Allow player to walk through monster
-            Physics2D.IgnoreLayerCollision(7, 9);
+            healthbar.fillAmount = currentHealth / maxHealth;
+            manabar.fillAmount = currentMana / maxMana;
+
+            // Lvling up
+            if (exp >= maxexp)
+            {
+                CharacterAttribute character = DataHandler.ReadFromJSON<CharacterAttribute>("CharacterAttribute");
+                exp = exp - maxexp;
+                character.level += 1;
+                character.experience = exp;
+                character.remainingStatsPt += 1;
+                maxexp = Mathf.FloorToInt((character.level * 200) + 1000);
+                DataHandler.SaveToJSON(character, "CharacterAttribute");
+            }
 
             isTouchingGround = bodyCollider.IsTouchingLayers(ground);
             float direction = Input.GetAxisRaw("Horizontal");
@@ -77,31 +100,6 @@ public class HomeTownPlayerController : MonoBehaviour
                 playerAnimator.SetBool("Jump", false);
             }
 
-            //Limiting Attack rate
-            if (Time.time >= nextAttackTime)
-            {
-                // Attacking
-                if (Input.GetKeyDown(KeyCode.Space) && isTouchingGround)
-                {
-                    nextAttackTime = Time.time + (attackRate - attackRateBoost);  //TIme of now + attack rate
-
-                    // Player animator
-                    playerAnimator.SetTrigger("Attack");
-
-                    // Detect enemies in range of attack
-                    Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(AttackPoint.position, attackRange, enemyLayers);
-
-                    if (hitEnemies.Length != 0)
-                    {
-                        //Damage enemies
-                        foreach (Collider2D enemy in hitEnemies)
-                        {
-                            enemy.GetComponent<Skeleton>().TakeDamage(20);
-                        }
-                    }
-                }
-            }
-
         }
         else
         {
@@ -109,6 +107,7 @@ public class HomeTownPlayerController : MonoBehaviour
         }
 
     }
+
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
@@ -123,20 +122,8 @@ public class HomeTownPlayerController : MonoBehaviour
 
     void Die()
     {
-        Debug.Log("Player died!");
         //Die animation
         playerAnimator.SetBool("IsDead", true);
-        //Disable the player.
-        GetComponent<Collider2D>().enabled = false;
-        enabled = false;
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        if (AttackPoint == null)
-        {
-            return;
-        }
-        Gizmos.DrawWireSphere(AttackPoint.position, attackRange);
+        p.velocity = Vector2.zero;
     }
 }

@@ -1001,7 +1001,7 @@ GameObject:
   - component: {fileID: 182734124}
   - component: {fileID: 182734122}
   - component: {fileID: 182734121}
-  - component: {fileID: 182734129}
+  - component: {fileID: 182734131}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -1074,7 +1074,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 1
-  m_Mass: 320.99017
+  m_Mass: 427.4114
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 20
@@ -1135,75 +1135,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &182734129
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 182734120}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 907f418d88abd8740979df1315775a81, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dmgTaken: {fileID: 0}
-  lvlup: {fileID: 0}
-  manaCost: {fileID: 0}
-  healthbar: {fileID: 0}
-  manabar: {fileID: 0}
-  fireBallSpell: {fileID: 0}
-  rageSpell: {fileID: 0}
-  revitalizeSpell: {fileID: 0}
-  healIndicator: {fileID: 0}
-  rejuvinateSpell: {fileID: 0}
-  manaIndicator: {fileID: 0}
-  walkSpeed: 10000
-  jumpVelocity: 8000
-  bodyCollider: {fileID: 182734121}
-  ground:
-    serializedVersion: 2
-    m_Bits: 64
-  playerAnimator: {fileID: 182734122}
-  monster1:
-    serializedVersion: 2
-    m_Bits: 512
-  monster2:
-    serializedVersion: 2
-    m_Bits: 2048
-  monster3:
-    serializedVersion: 2
-    m_Bits: 4096
-  monster4:
-    serializedVersion: 2
-    m_Bits: 0
-  AttackPoint: {fileID: 0}
-  attackRange: 0.5
-  attackRate: 0.2
-  attackRateBoost: 0
-  currentHealth: 0
-  currentMana: 0
-  atkDMG: 0
-  exp: 0
-  gold: 0
-  amountKilled: 0
-  quest1:
-    questTitle: 
-    questObjective: 
-    objectiveAmount: 0
-    archiveAmount: 0
-    rewardExp: 0
-    rewardGold: 0
-    questStatus: 
-  fireBall: {fileID: 779290425}
-  swing: {fileID: 368763807}
-  footstep: {fileID: 1583294657}
-  rage: {fileID: 72444236}
-  rageEnd: {fileID: 178997010}
-  fireball: {fileID: 1190499353}
-  levelUp: {fileID: 0}
-  heal: {fileID: 0}
-  regenMana: {fileID: 0}
 --- !u!224 &182734130
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1227,6 +1158,31 @@ RectTransform:
   m_AnchoredPosition: {x: -804.5, y: -390}
   m_SizeDelta: {x: 1.761, y: 0.44}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &182734131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 182734120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e5a562ccc1fd6e49a6eadc14a586803, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bodyCollider: {fileID: 182734121}
+  ground:
+    serializedVersion: 2
+    m_Bits: 64
+  playerAnimator: {fileID: 182734122}
+  currentHealth: 0
+  currentMana: 0
+  atkDMG: 0
+  exp: 0
+  gold: 0
+  healthbar: {fileID: 972238966}
+  manabar: {fileID: 320433906}
+  footstep: {fileID: 1583294657}
 --- !u!1 &187191973
 GameObject:
   m_ObjectHideFlags: 0
@@ -2728,7 +2684,7 @@ GameObject:
   - component: {fileID: 246501798}
   - component: {fileID: 246501797}
   - component: {fileID: 246501796}
-  - component: {fileID: 246501795}
+  - component: {fileID: 246501799}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2736,20 +2692,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &246501795
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 246501794}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18830eb7311cc394abebfb00c92d9259, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  followSpeed: 7
-  yPos: 0.2
 --- !u!81 &246501796
 AudioListener:
   m_ObjectHideFlags: 0
@@ -2816,6 +2758,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &246501799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 246501794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18830eb7311cc394abebfb00c92d9259, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  followSpeed: 7
+  yPos: 0
 --- !u!1 &249794340
 GameObject:
   m_ObjectHideFlags: 0
@@ -4147,10 +4103,10 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 255c050ccda8e5c44b600331e374e2b4, type: 3}
-  m_Type: 0
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 0
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -5346,8 +5302,8 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 246501797}
-  m_PlaneDistance: 100
-  m_PixelPerfect: 1
+  m_PlaneDistance: 10
+  m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
@@ -5373,11 +5329,11 @@ RectTransform:
   - {fileID: 1478596303}
   - {fileID: 2048688006}
   - {fileID: 182734130}
-  - {fileID: 1006766611}
   - {fileID: 1607650607}
+  - {fileID: 1006766611}
   - {fileID: 1807613439}
-  - {fileID: 1361487467}
   - {fileID: 1498650248}
+  - {fileID: 1361487467}
   - {fileID: 1471914872}
   - {fileID: 1876425236}
   - {fileID: 1706341023}
@@ -5385,8 +5341,8 @@ RectTransform:
   - {fileID: 1167149720}
   - {fileID: 1085336191}
   - {fileID: 1344207945}
-  - {fileID: 1215658181}
   - {fileID: 1070029559}
+  - {fileID: 1215658181}
   - {fileID: 187191978}
   - {fileID: 2112930385}
   - {fileID: 1865023428}
@@ -12412,10 +12368,10 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 26f8c775a276da347a1cc9a82ec1ac45, type: 3}
-  m_Type: 0
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 0
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -13718,7 +13674,7 @@ RectTransform:
   - {fileID: 367002893}
   - {fileID: 2091336354}
   m_Father: {fileID: 387373955}
-  m_RootOrder: 18
+  m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
@@ -19745,7 +19701,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 387373955}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1498650249
 MonoBehaviour:
@@ -22135,7 +22091,7 @@ RectTransform:
   - {fileID: 980928746}
   - {fileID: 1624349241}
   m_Father: {fileID: 387373955}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -22331,7 +22287,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1619187263}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9fb848b8ed9c86342b2c0e41eeaaff91, type: 3}
+  m_Script: {fileID: 11500000, guid: 97614f61460676d40bf9186b0c9f0b51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: {fileID: 709252135}
