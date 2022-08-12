@@ -9,7 +9,7 @@ public class CharacterAttribute
     public int health;
     public int mana;
     public int level;
-    public double experience;
+    public int experience;
 
     //Resources
     public int gold;
@@ -24,7 +24,7 @@ public class CharacterAttribute
     {
 
     }
-    public CharacterAttribute(int strength, int defense, int health,int mana, int level,double experience, int gold, int strengthPt, int defensePt, int healthPt, int remainingPt)
+    public CharacterAttribute(int strength, int defense, int health,int mana, int level, int experience, int gold, int strengthPt, int defensePt, int healthPt, int remainingPt)
     {
         this.strength = strength;
         this.defense = defense;

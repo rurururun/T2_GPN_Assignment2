@@ -44,9 +44,9 @@ public class QuestButton : MonoBehaviour
                 CharacterAttribute character = DataHandler.ReadFromJSON<CharacterAttribute>("CharacterAttribute");
                 character.experience += quest.rewardExp;
                 character.gold += quest.rewardGold;
-                if (character.experience >= (character.level + 1000) * 1.3)
+                if (character.experience >= Mathf.FloorToInt((float)((character.level + 1000) * 1.5)))
                 {
-                    character.experience = character.experience - (character.level + 1000) * 1.3;
+                    character.experience = character.experience - Mathf.FloorToInt((float)((character.level + 1000) * 1.5));
                     character.level += 1;
                     character.remainingStatsPt += 1;
                 }

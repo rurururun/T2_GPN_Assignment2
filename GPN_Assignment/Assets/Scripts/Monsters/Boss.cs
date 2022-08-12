@@ -8,6 +8,8 @@ public class Boss : MonoBehaviour
 {
     // Variable for displaying dmg taken
     public TextMeshProUGUI dmgTaken;
+    public TextMeshProUGUI goldGranted;
+    public TextMeshProUGUI expGranted;
     public Image healthBar1;
     public Image healthBar2;
 
@@ -48,6 +50,8 @@ public class Boss : MonoBehaviour
     public Animator bossAnimator;
 
     public AudioSource fireball;
+    public AudioSource swing;
+    public AudioSource death;
 
     // Start is called before the first frame update
     void Start()
@@ -61,6 +65,8 @@ public class Boss : MonoBehaviour
         maxHealth = 2000;
         currentHealth = maxHealth;
         dmgTaken.enabled = false;
+        goldGranted.enabled = false;
+        expGranted.enabled = false;
     }
 
     // Update is called once per frame
@@ -197,6 +203,8 @@ public class Boss : MonoBehaviour
         // Activates the attack animation of the monster
         bossAnimator.SetTrigger("Attack");
 
+        swing.Play();
+
         yield return new WaitForSeconds(atkSpeed);
 
         player.GetComponent<PlayerController>().TakeDamage(atk);
@@ -260,8 +268,23 @@ public class Boss : MonoBehaviour
         }
     }
 
+    IEnumerator DisplayThingsGranted()
+    {
+        goldGranted.text = "+ " + 1000 + "G";
+        expGranted.text = "+ " + 2000 + "EXP";
+        goldGranted.enabled = true;
+        expGranted.enabled = true;
+
+        yield return new WaitForSeconds(1);
+
+        goldGranted.enabled = false;
+        expGranted.enabled = false;
+    }
+
     void Die()
     {
+        death.Play();
+
         CharacterAttribute character = DataHandler.ReadFromJSON<CharacterAttribute>("CharacterAttribute");
 
         // Death animation
@@ -283,6 +306,8 @@ public class Boss : MonoBehaviour
         character.experience += 1000;
         character.gold += 2000;
         DataHandler.SaveToJSON(character, "CharacterAttribute");
+
+        StartCoroutine(DisplayThingsGranted());
 
         // Monster revives after a set amount of time
         StartCoroutine(MonsterRespawn());

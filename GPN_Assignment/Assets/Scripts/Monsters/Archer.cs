@@ -8,6 +8,8 @@ public class Archer : MonoBehaviour
 {
     // Variable for displaying dmg taken
     public TextMeshProUGUI dmgTaken;
+    public TextMeshProUGUI goldGranted;
+    public TextMeshProUGUI expGranted;
     public Image healthBar;
 
     // Variable for movement
@@ -24,14 +26,11 @@ public class Archer : MonoBehaviour
     public Transform attackPosB;
     public LayerMask groundLayer;
     public LayerMask obstacles;
-    public LayerMask skeletonLayer;
-    public LayerMask archerLayer;
     public Collider2D bodyCollider;
     public Rigidbody2D archer;
-
-    // Array of colliders of the monsters
-    private Collider2D[] skeletons;
-    private Collider2D[] archers;
+    GameObject[] skele;
+    GameObject[] archers;
+    GameObject[] hell;
 
     // Variables for detecting player
     private Transform player;
@@ -54,6 +53,8 @@ public class Archer : MonoBehaviour
     // Animator for monster
     public Animator archerAnimator;
 
+    public AudioSource death;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -68,6 +69,11 @@ public class Archer : MonoBehaviour
         hurt = false;
         healthBar.enabled = false;
         dmgTaken.enabled = false;
+        goldGranted.enabled = false;
+        expGranted.enabled = false;
+        skele = GameObject.FindGameObjectsWithTag("Skeleton");
+        archers = GameObject.FindGameObjectsWithTag("Archer");
+        hell = GameObject.FindGameObjectsWithTag("Hell_Hand");
     }
 
     // Update is called once per frame
@@ -140,10 +146,6 @@ public class Archer : MonoBehaviour
 
     void Patrol()
     {
-        // Getting the list of monsters that it has came into contact with
-        skeletons = Physics2D.OverlapCircleAll(objectCheckPos.position, 0.1f, skeletonLayer);
-        archers = Physics2D.OverlapCircleAll(objectCheckPos.position, 0.1f, archerLayer);
-
         // Checking if monster needs to turn
         if (mustTurn || bodyCollider.IsTouchingLayers(obstacles))
         {
@@ -151,25 +153,17 @@ public class Archer : MonoBehaviour
         }
 
         // Allowing monsters to walk past each other
-        if (skeletons.Length != 0)
+        foreach (GameObject g in skele)
         {
-            foreach (Collider2D enemy in skeletons)
-            {
-                if (bodyCollider.IsTouching(enemy))
-                {
-                    Physics2D.IgnoreCollision(bodyCollider, enemy);
-                }
-            }
+            Physics2D.IgnoreCollision(bodyCollider, g.GetComponent<Skeleton>().bodyCollider);
         }
-        if (archers.Length != 0)
+        foreach (GameObject g in archers)
         {
-            foreach (Collider2D enemy in archers)
-            {
-                if (bodyCollider.IsTouching(enemy))
-                {
-                    Physics2D.IgnoreCollision(bodyCollider, enemy);
-                }
-            }
+            Physics2D.IgnoreCollision(bodyCollider, g.GetComponent<Archer>().bodyCollider);
+        }
+        foreach (GameObject g in hell)
+        {
+            Physics2D.IgnoreCollision(bodyCollider, g.GetComponent<Hell_Hand>().bodyCollider);
         }
 
         // Setting the movement of the monster
@@ -217,9 +211,24 @@ public class Archer : MonoBehaviour
         }
     }
 
+    IEnumerator DisplayThingsGranted()
+    {
+        goldGranted.text = "+ " + 200 + "G";
+        expGranted.text = "+ " + 100 + "EXP";
+        goldGranted.enabled = true;
+        expGranted.enabled = true;
+
+        yield return new WaitForSeconds(1);
+
+        goldGranted.enabled = false;
+        expGranted.enabled = false;
+    }
+
     void Die()
     {
         healthBar.enabled = false;
+
+        death.Play();
 
         CharacterAttribute character = DataHandler.ReadFromJSON<CharacterAttribute>("CharacterAttribute");
 
@@ -242,6 +251,8 @@ public class Archer : MonoBehaviour
         character.experience += 100;
         character.gold += 200;
         DataHandler.SaveToJSON(character, "CharacterAttribute");
+
+        StartCoroutine(DisplayThingsGranted());
 
         // Monster revives after a set amount of time
         StartCoroutine(MonsterRespawn());

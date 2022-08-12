@@ -8,8 +8,16 @@ public class PlayerController : MonoBehaviour
 {
     // Variable for displaying dmg taken
     public TextMeshProUGUI dmgTaken;
+    public TextMeshProUGUI lvlup;
+    public TextMeshProUGUI manaCost;
     public Image healthbar;
     public Image manabar;
+    public Image fireBallSpell;
+    public Image rageSpell;
+    public Image revitalizeSpell;
+    public TextMeshProUGUI healIndicator;
+    public Image rejuvinateSpell;
+    public TextMeshProUGUI manaIndicator;
 
     public float walkSpeed, jumpVelocity;
     private Rigidbody2D p;
@@ -39,8 +47,8 @@ public class PlayerController : MonoBehaviour
     public int atkDMG;
     bool attacking = false;
     int lvl;
-    double maxexp;
-    public double exp;
+    int maxexp;
+    public int exp;
     int attackCount = 1;
     public int gold;
     public int amountKilled;
@@ -62,12 +70,19 @@ public class PlayerController : MonoBehaviour
     public AudioSource rage;
     public AudioSource rageEnd;
     public AudioSource fireball;
+    public AudioSource levelUp;
+    public AudioSource heal;
+    public AudioSource regenMana;
 
 
     // Start is called before the first frame update
     void Start()
     {
+        lvlup.enabled = false;
         dmgTaken.enabled = false;
+        healIndicator.enabled = false;
+        manaIndicator.enabled = false;
+        manaCost.enabled = false;
         p = GetComponent<Rigidbody2D>();
         List<Quest> questList = DataHandler.ReadListFromJSON<Quest>("Quest");
         foreach (Quest quest in questList)
@@ -84,7 +99,7 @@ public class PlayerController : MonoBehaviour
         atkDMG = character.strength;
         lvl = character.level;
         exp = character.experience;
-        maxexp = (character.level + 1000) * 1.3;
+        maxexp = Mathf.FloorToInt((float)((character.level + 1000) * 1.5));
         defense = character.defense;
         currentMana = character.mana;
         maxMana = currentMana;
@@ -112,11 +127,14 @@ public class PlayerController : MonoBehaviour
             // Lvling up
             if (exp >= maxexp)
             {
+                levelUp.Play();
+                StartCoroutine(DisplayLvlUp());
                 CharacterAttribute character = DataHandler.ReadFromJSON<CharacterAttribute>("CharacterAttribute");
                 exp = exp - maxexp;
                 character.level += 1;
+                character.experience = exp;
                 character.remainingStatsPt += 1;
-                maxexp = (character.level + 1000) * 1.3;
+                maxexp = Mathf.FloorToInt((float)((character.level + 1000) * 1.5));
                 DataHandler.SaveToJSON(character, "CharacterAttribute");
             }
 
@@ -186,6 +204,15 @@ public class PlayerController : MonoBehaviour
                 StartCoroutine(Rage());
             }
         }
+    }
+
+    IEnumerator DisplayLvlUp()
+    {
+        lvlup.enabled = true;
+
+        yield return new WaitForSeconds(1);
+
+        lvlup.enabled = false;
     }
 
     IEnumerator DisplayDmgTaken(int damage)
@@ -317,7 +344,11 @@ public class PlayerController : MonoBehaviour
     {
         canShoot = false;
 
+        fireBallSpell.fillAmount = 0f;
+
         currentMana -= fireBall.GetComponent<FireBall>().manaCost;
+
+        StartCoroutine(DisplayManaCost());
 
         fireball.Play();
 
@@ -336,6 +367,8 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(2);
 
         canShoot = true;
+
+        fireBallSpell.fillAmount = 1f;
     }
 
     IEnumerator Rage()
@@ -356,14 +389,20 @@ public class PlayerController : MonoBehaviour
 
         rageEnd.Play();
 
+        rageSpell.fillAmount = 0f;
+
         yield return new WaitForSeconds(30);
 
         canRage = true;
+
+        rageSpell.fillAmount = 1f;
     }
 
     IEnumerator RegenMana()
     {
         canRegenMana = false;
+
+        regenMana.Play();
 
         currentMana += (float)(maxMana * 0.3);
 
@@ -372,7 +411,13 @@ public class PlayerController : MonoBehaviour
             currentMana = maxMana;
         }
 
+        StartCoroutine(DisplayManaIndicator());
+
+        rejuvinateSpell.fillAmount = 0f;
+
         yield return new WaitForSeconds(15);
+
+        rejuvinateSpell.fillAmount = 1f;
 
         canRegenMana = true;
     }
@@ -381,6 +426,8 @@ public class PlayerController : MonoBehaviour
     {
         canRegenHP = false;
 
+        heal.Play();
+
         currentHealth += (float)(maxHealth * 0.3);
 
         if (currentHealth > maxHealth)
@@ -388,8 +435,47 @@ public class PlayerController : MonoBehaviour
             currentHealth = maxHealth;
         }
 
+        StartCoroutine(DisplayHealIndicator());
+
+        revitalizeSpell.fillAmount = 0f;
+
         yield return new WaitForSeconds(15);
 
+        revitalizeSpell.fillAmount = 1f;
+
         canRegenHP = true;
+    }
+
+    IEnumerator DisplayHealIndicator()
+    {
+        healIndicator.text = "+ " + (float)(maxHealth * 0.3) + "HP";
+        healIndicator.transform.position = new Vector2(p.transform.position.x, p.transform.position.y + 20);
+        healIndicator.enabled = true;
+
+        yield return new WaitForSeconds(1);
+
+        healIndicator.enabled = false;
+    }
+
+    IEnumerator DisplayManaIndicator()
+    {
+        manaIndicator.text = "+ " + (float)(maxMana * 0.3) + "MP";
+        manaIndicator.transform.position = new Vector2(p.transform.position.x, p.transform.position.y + 20);
+        manaIndicator.enabled = true;
+
+        yield return new WaitForSeconds(1);
+
+        manaIndicator.enabled = false;
+    }
+
+    IEnumerator DisplayManaCost()
+    {
+        manaCost.text = "- " + fireBall.GetComponent<FireBall>().manaCost + "MP";
+        manaCost.transform.position = new Vector2(p.transform.position.x, p.transform.position.y + 20);
+        manaCost.enabled = true;
+
+        yield return new WaitForSeconds(1);
+
+        manaCost.enabled = false;
     }
 }

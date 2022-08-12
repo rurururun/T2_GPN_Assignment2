@@ -8,6 +8,8 @@ public class Hell_Hand : MonoBehaviour
 {
     // Variable for displaying dmg taken
     public TextMeshProUGUI dmgTaken;
+    public TextMeshProUGUI goldGranted;
+    public TextMeshProUGUI expGranted;
     public Image healthBar;
 
     // Variable for movement
@@ -23,16 +25,11 @@ public class Hell_Hand : MonoBehaviour
     public Transform attackPos;
     public LayerMask groundLayer;
     public LayerMask obstacles;
-    public LayerMask skeletonLayer;
-    public LayerMask archerLayer;
-    public LayerMask hell_handLayer;
     public Collider2D bodyCollider;
     public Rigidbody2D hell_hand;
-
-    // Array of colliders of the monsters
-    private Collider2D[] skeletons;
-    private Collider2D[] archers;
-    private Collider2D[] hell_hands;
+    GameObject[] skele;
+    GameObject[] archer;
+    GameObject[] hell;
 
     // Variables for detecting player
     private Transform player;
@@ -53,6 +50,7 @@ public class Hell_Hand : MonoBehaviour
     public Animator hell_handAnimator;
 
     public AudioSource swing;
+    public AudioSource death;
 
     // Start is called before the first frame update
     void Start()
@@ -61,6 +59,8 @@ public class Hell_Hand : MonoBehaviour
         maxHealth = 150f;
         healthBar.enabled = false;
         dmgTaken.enabled = false;
+        goldGranted.enabled = false;
+        expGranted.enabled = false;
         mustPatrol = true;
         hell_hand = GetComponent<Rigidbody2D>();
         player = GameObject.Find("Player").transform;
@@ -68,6 +68,9 @@ public class Hell_Hand : MonoBehaviour
         currentHealth = maxHealth;
         canAttack = true;
         hurt = false;
+        skele = GameObject.FindGameObjectsWithTag("Skeleton");
+        archer = GameObject.FindGameObjectsWithTag("Archer");
+        hell = GameObject.FindGameObjectsWithTag("Hell_Hand");
     }
 
     // Update is called once per frame
@@ -140,11 +143,6 @@ public class Hell_Hand : MonoBehaviour
 
     void Patrol()
     {
-        // Getting the list of monsters that it has came into contact with
-        skeletons = Physics2D.OverlapCircleAll(objectCheckPos.position, 0.1f, skeletonLayer);
-        archers = Physics2D.OverlapCircleAll(objectCheckPos.position, 0.1f, archerLayer);
-        hell_hands = Physics2D.OverlapCircleAll(objectCheckPos.position, 0.1f, hell_handLayer);
-
         // Checking if monster needs to turn
         if (mustTurn || bodyCollider.IsTouchingLayers(obstacles))
         {
@@ -152,35 +150,17 @@ public class Hell_Hand : MonoBehaviour
         }
 
         // Allowing monsters to walk past each other
-        if (skeletons.Length != 0)
+        foreach (GameObject g in skele)
         {
-            foreach (Collider2D enemy in skeletons)
-            {
-                if (bodyCollider.IsTouching(enemy))
-                {
-                    Physics2D.IgnoreCollision(bodyCollider, enemy);
-                }
-            }
+            Physics2D.IgnoreCollision(bodyCollider, g.GetComponent<Skeleton>().bodyCollider);
         }
-        if (archers.Length != 0)
+        foreach (GameObject g in archer)
         {
-            foreach (Collider2D enemy in archers)
-            {
-                if (bodyCollider.IsTouching(enemy))
-                {
-                    Physics2D.IgnoreCollision(bodyCollider, enemy);
-                }
-            }
+            Physics2D.IgnoreCollision(bodyCollider, g.GetComponent<Archer>().bodyCollider);
         }
-        if (hell_hands.Length != 0)
+        foreach (GameObject g in hell)
         {
-            foreach (Collider2D enemy in hell_hands)
-            {
-                if (bodyCollider.IsTouching(enemy))
-                {
-                    Physics2D.IgnoreCollision(bodyCollider, enemy);
-                }
-            }
+            Physics2D.IgnoreCollision(bodyCollider, g.GetComponent<Hell_Hand>().bodyCollider);
         }
 
         // Setting the movement of the monster
@@ -255,9 +235,24 @@ public class Hell_Hand : MonoBehaviour
         }
     }
 
+    IEnumerator DisplayThingsGranted()
+    {
+        goldGranted.text = "+ " + 400 + "G";
+        expGranted.text = "+ " + 200 + "EXP";
+        goldGranted.enabled = true;
+        expGranted.enabled = true;
+
+        yield return new WaitForSeconds(1);
+
+        goldGranted.enabled = false;
+        expGranted.enabled = false;
+    }
+
     void Die()
     {
         healthBar.enabled = false;
+
+        death.Play();
 
         CharacterAttribute character = DataHandler.ReadFromJSON<CharacterAttribute>("CharacterAttribute");
 
@@ -276,10 +271,12 @@ public class Hell_Hand : MonoBehaviour
 
         // Gives player exp and gold
         player.GetComponent<PlayerController>().exp += 200;
-        player.GetComponent<PlayerController>().gold += 500;
+        player.GetComponent<PlayerController>().gold += 400;
         character.experience += 200;
-        character.gold += 500;
+        character.gold += 400;
         DataHandler.SaveToJSON(character, "CharacterAttribute");
+
+        StartCoroutine(DisplayThingsGranted());
 
         // Quest
         Quest currentQuest = player.GetComponent<PlayerController>().quest1;
