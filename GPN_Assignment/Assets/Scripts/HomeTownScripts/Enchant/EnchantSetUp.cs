@@ -7,7 +7,7 @@ using TMPro;
 
 public class EnchantSetUp : MonoBehaviour
 {
-    public TextMeshProUGUI SelectedItemName;
+    public TextMeshProUGUI SelectedItemType;
     public TextMeshProUGUI EnchantItemName;
     public TextMeshProUGUI EnchantItemAttribute;
     public TextMeshProUGUI EnchantItemEnchantLvl;
@@ -20,11 +20,12 @@ public class EnchantSetUp : MonoBehaviour
 
     public void setUpEnchant()
     {       
-        selectedEquipmentType = SelectedItemName.text.ToString();
+        selectedEquipmentType = SelectedItemType.text.ToString();
         //selectedEquipment = new Equipment("null",0,0);
         enchantButton.SetActive(true);
         selectedEquipment = EnchantTrigger.GetEquipmentAttribute(selectedEquipmentType);
         EnchantItemName.text = selectedEquipment.equipmentType;
+        Debug.Log("selected" + selectedEquipment.equipmentType);
 
         //Define type of equipment attribute
         string Attribute = selectedEquipment.equipmentArritbute.ToString();

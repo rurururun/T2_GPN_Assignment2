@@ -10,6 +10,9 @@ public class EnchantTrigger : MonoBehaviour
     [Header("Enchant Panel")]
     [SerializeField] private GameObject enchantPanel;
 
+    [Header("Visual Hint")]
+    [SerializeField] private GameObject visualHint;
+
     public GameObject playButton;
     public GameObject characterButton;
     public GameObject howToPlayButton;   
@@ -34,6 +37,7 @@ public class EnchantTrigger : MonoBehaviour
         //Set default to false
         playerInRange = false;
         enchantVisualCue.SetActive(false);
+        visualHint.SetActive(false);
     }
 
     private void Update()
@@ -41,6 +45,7 @@ public class EnchantTrigger : MonoBehaviour
         if (playerInRange)
         {
             enchantVisualCue.SetActive(true);
+            visualHint.SetActive(true);
             if (Input.GetKeyDown(KeyCode.I))
             {
                 playButton.SetActive(false);
@@ -51,6 +56,7 @@ public class EnchantTrigger : MonoBehaviour
         }
         else
         {
+            visualHint.SetActive(false);
             enchantVisualCue.SetActive(false);
         }
     }

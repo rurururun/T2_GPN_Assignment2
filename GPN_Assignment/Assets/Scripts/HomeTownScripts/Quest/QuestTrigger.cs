@@ -5,10 +5,13 @@ using TMPro;
 
 public class QuestTrigger : MonoBehaviour
 {
-    [Header("Enchant Visual Cue")]
+    [Header("Quest Visual Cue")]
     [SerializeField] private GameObject questVisualCue;
 
-    [Header("Enchant Panel")]
+    [Header("Quest Visual Hint")]
+    [SerializeField] private GameObject questHintText;
+
+    [Header("Quest Panel")]
     [SerializeField] private GameObject questPanel;
 
     public GameObject playButton;
@@ -24,6 +27,7 @@ public class QuestTrigger : MonoBehaviour
         if (playerInRange)
         {
             questVisualCue.SetActive(true);
+            questHintText.SetActive(true);
             if (Input.GetKeyDown(KeyCode.I))
             {
                 playButton.SetActive(false);
@@ -34,6 +38,7 @@ public class QuestTrigger : MonoBehaviour
         }
         else
         {
+            questHintText.SetActive(false);
             questVisualCue.SetActive(false);
         }
     }

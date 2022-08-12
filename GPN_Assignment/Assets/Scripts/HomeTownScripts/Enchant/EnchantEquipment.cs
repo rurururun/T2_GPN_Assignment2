@@ -18,7 +18,7 @@ public class EnchantEquipment : MonoBehaviour
     {
         enchantEquipment = EnchantSetUp.currentEquipment();
 
-        Debug.Log(enchantEquipment.equipmentType);
+        Debug.Log("selectedEnchant" +  enchantEquipment.equipmentType);
 
         //Check if is max level
         if (enchantEquipment.equipmentEnchantLvl < 24)
@@ -61,11 +61,12 @@ public class EnchantEquipment : MonoBehaviour
                         equipment.equipmentArritbute = enchantEquipment.equipmentArritbute;
                         equipment.equipmentEnchantCost = enchantEquipment.equipmentEnchantCost;
                         equipment.equipmentEnchantLvl = enchantEquipment.equipmentEnchantLvl;
+                        break;
                     }
                 }
                 enchantStatus.text = "Enchance Successfuly!!";
                 updateChracterAttribute(equipmentList, enchantEquipment, character);
-                EnchantTrigger.updateEquipmentList();
+                //EnchantTrigger.updateEquipmentList();
                 enchantPanel.SetActive(false);
                 enchantPanel.SetActive(true);
                 statusBar.SetActive(false);
@@ -85,6 +86,7 @@ public class EnchantEquipment : MonoBehaviour
     //Update Overall Character Attribute
     public static void updateChracterAttribute(List<Equipment> equipmentList, Equipment currentEquipment, CharacterAttribute character)
     {
+        Debug.Log("equipmentType" + currentEquipment.equipmentType);
         foreach (Equipment equipment in equipmentList)
         {
             if (equipment.equipmentType == currentEquipment.equipmentType)
@@ -102,13 +104,13 @@ public class EnchantEquipment : MonoBehaviour
                 character.health = equipment.equipmentArritbute;
                 break;
             }
-            else
+            else if (equipment.equipmentType == currentEquipment.equipmentType)
             {
+                Debug.Log("Defense update");
                 character.defense = equipment.equipmentArritbute;
                 break;
             }
         }
-
         for (int i = 0; i < character.strengthStatsPt; i++)
         {
             character.strength += 5;
